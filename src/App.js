@@ -6,7 +6,7 @@ class App extends Component {
   constructor() {
     super();
 
-    console.log('App.constructor - entrée');
+    console.log('App.constructor - entrée2');
     this.state = {restos: []};
 
     this.hostname = 'localhost';

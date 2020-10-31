@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import ListeRestos from './ListeRestos';
+import RestoForm from './RestoForm';
 
 class App extends Component {
 
@@ -7,13 +9,12 @@ class App extends Component {
     super();
 
     console.log('App.constructor - entrée2');
-    this.state = {restos: [], currentId:'', currentName:'', currentImage:'', currentDescription:''};
+    //this.state = { restos: [], currentId: '', currentName: '', currentImage: '', currentDescription: '' };
+    this.state = { restos: [], currentResto: {id:'', name:'', image:'', description:''} };
 
     this.hostname = 'localhost';
     if (process.env.NODE_ENV == 'production')
       this.hostname = '35.180.173.251';
-
-    this.prevTargetSelected = undefined;
   }
 
   componentDidMount() {
@@ -26,12 +27,12 @@ class App extends Component {
     // });
 
     axios.get(`http://${this.hostname}:8888/api/v1/restos`)
-    .then((res) => {
-      console.log(res.data);
-      let reponse = res.data;
-      if (reponse.code === 0)
-        this.setState({restos:reponse.data});
-    });
+      .then((res) => {
+        console.log(res.data);
+        let reponse = res.data;
+        if (reponse.code === 0)
+          this.setState({ restos: reponse.data });
+      });
   }
 
   handleSubmit = (event) => {
@@ -49,66 +50,28 @@ class App extends Component {
     // this.setState({restos});
   }
 
-  handleAdd = (event) => {
-    // évite que la page ne se recharge complètement
-    event.preventDefault();
+  handleAdd = (resto) => {
+    //const restos = this.state.restos.slice();
+    // le spread operator ... permet d'itérer sur tous les éléments du tableau et d'en faire un copie
+    const restos = [...this.state.restos];
 
-    if (this.state.currentId === '') {
-      alert('id obligatoire!');
-      return;
-    }
-    if (this.state.currentName === '') {
-      alert('name obligatoire!');
-      return;
-    }
+    restos.push(resto);
 
-    const nouveauResto = {
-      id: this.state.currentId,
-      name: this.state.currentName,
-      image: this.state.currentImage,
-      description: this.state.currentDescription
-    };
-
-    const restos = this.state.restos.slice();
-    restos.push(nouveauResto);
-    this.setState({restos});
+    //this.setState({restos:restos});
+    // équivaut à l'instruction ci-dessus {restos} <=> {restos:restos}
+    this.setState({ restos });
   }
 
-  handleChangeId = (event) => {
-    const value = event.currentTarget.value;
-    this.setState({currentId:value});
+  handleSelect = (resto) => {
+    this.setState({currentResto: resto});
 
+    // this.setState({ currentId: resto.id });
+    // this.setState({ currentName: resto.name });
+    // this.setState({ currentImage: resto.image });
+    // this.setState({ currentDescription: resto.description });
   }
 
-  handleChangeName = (event) => {
-    const value = event.currentTarget.value;
-    this.setState({currentName:value});
-
-  }
-
-  handleChangeDescription = (event) => {
-    const value = event.currentTarget.value;
-    this.setState({currentDescription:value});
-
-  }
-
-  handleSelect = (resto, event) => {
-    console.log('handleselect');
-
-    if (this.prevTargetSelected !== undefined) {
-      this.prevTargetSelected.style.backgroundColor = 'white';
-    }
-    this.prevTargetSelected = event.currentTarget;
-
-    event.currentTarget.style.backgroundColor = 'yellow';
-
-    this.setState({currentId: resto.id});
-    this.setState({currentName: resto.name});
-    this.setState({currentImage: resto.image});
-    this.setState({currentDescription: resto.description});
-  }
-
-    handleDelete = (event) => {
+  handleDelete = (event) => {
     // évite que la page ne se recharge complètement
     event.preventDefault();
 
@@ -121,20 +84,22 @@ class App extends Component {
     this.prevTargetSelected = undefined;
 
     // Effectue une copie du tableau
-    const restos = this.state.restos.slice();
+    //const restos = this.state.restos.slice();
+    const restos = [...this.state.restos];
 
     // Renvoie l'index dans le tableau de l'élément correspond à l'id transmis en paramètre
     const index = restos.findIndex(resto => resto.id === this.state.currentId);
 
     // Supprime l'élément du tableau
-    restos.splice(index,1);
+    restos.splice(index, 1);
 
-    this.setState({restos: restos});
+    //this.setState({restos: restos});
+    this.setState({ restos });
 
-    this.setState({currentId: ''});
-    this.setState({currentName: ''});
-    this.setState({currentImage: ''});
-    this.setState({currentDescription: ''});
+    this.setState({ currentId: '' });
+    this.setState({ currentName: '' });
+    this.setState({ currentImage: '' });
+    this.setState({ currentDescription: '' });
   }
 
   handleUpdate = (event) => {
@@ -146,15 +111,17 @@ class App extends Component {
     }
 
     // Effectue une copie du tableau
-    const restos = this.state.restos.slice();
+    //const restos = this.state.restos.slice();
+    const restos = [...this.state.restos];
 
     // Renvoie l'index dans le tableau de l'élément correspond à l'id transmis en paramètre
     const index = restos.findIndex(resto => resto.id === this.state.currentId);
 
     // Maj élément du tableau
-    restos[index] = {id:this.state.currentId, name:this.state.currentName, image:this.state.currentImage, description:this.state.currentDescription};
+    restos[index] = { id: this.state.currentId, name: this.state.currentName, image: this.state.currentImage, description: this.state.currentDescription };
 
-    this.setState({restos: restos});
+    //this.setState({restos: restos});
+    this.setState({ restos });
   }
 
 
@@ -164,33 +131,13 @@ class App extends Component {
 
   render() {
     console.log(this.state.restos);
-    
+
     return (
       <div>
-        <h1>Liste des restos</h1>
-        <table>
-          <tr>
-            <th>id</th><th>name</th><th>image</th><th>description</th>
-          </tr>
-          {this.state.restos.map((resto) => (
-            <tr onClick={(event) => this.handleSelect(resto, event)}>
-                <td>{resto.id}</td> 
-                <td>{resto.name}</td> 
-                <td>{resto.image}</td> 
-                <td>{resto.description}</td> 
-            </tr>
-          ))}
-        </table>
+        <ListeRestos restosObj={this.state.restos} onSelect={this.handleSelect} />
 
-        <form>
-            <input type='text' placeholder='id' value={this.state.currentId} onChange={this.handleChangeId}/><br/>
-            <input type='text' placeholder='name' value={this.state.currentName} onChange={this.handleChangeName}/><br/>
-            <input type='text' placeholder='image'/><br/>
-            <input type='text' placeholder='description' value={this.state.currentDescription} onChange={this.handleChangeDescription}/><br/>
-            <button onClick={this.handleAdd}>Ajouter</button>
-            <button onClick={this.handleUpdate}>Modifier</button>
-            <button onClick={this.handleDelete}>Supprimer</button>
-        </form>
+        <RestoForm currentResto={this.state.currentResto} onAdd={this.handleAdd}/>
+
         <button onClick={this.handleSave}>Enregistrer</button>
       </div>
     );

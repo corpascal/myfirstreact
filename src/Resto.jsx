@@ -1,32 +1,27 @@
 // Le 1er import React correspond à l'export par défaut du module ==> On peut le renommer comme on veut
 // Le 2ème import correspond au nom exact de l'élément exporté (c'est ce qui signifie {}) ==> on ne peut le renommer
 // car il ne s'agit pas de l'export par défaut du module
-import React, { Component } from 'react';
+import React from 'react';
 
-class Resto extends Component {
+//function Resto(props) {
+// On peut directemebnt faire une déstructuration du paramètre props => {restoObj, onSelect}
+function Resto({restoObj, onSelect}) {
 
-    constructor() {
-        super();
+    // dans une fonction, il n'y a pas de propriété comme dans une classe
+    // Il faut donc ajouter le mot-clé "const" ou "let" pour définir la fonction handleselect comme une varibale de la fonction Resto
+    const handleSelect = (resto, event) => {
+        onSelect(resto, event);
     }
 
-    handleSelect = (resto, event) => {
-        this.props.onSelect(resto, event);
-    }
-
-    render() {
-        //const restoObj = this.props.restoObj;
-        // Idem que ligne ci-dessus mais avec la déstructuration (extraction de la propriété restoObj de this.props)
-        const {restoObj} = this.props;
-
-        return (
-            <tr onClick={(event) => this.handleSelect(restoObj, event)}>
-                <td>{restoObj.id}</td>
-                <td>{restoObj.name}</td>
-                <td>{restoObj.image}</td>
-                <td>{restoObj.description}</td>
-            </tr>
-        )
-    }
+    return (
+        <tr onClick={(event) => handleSelect(restoObj, event)}>
+            <td>{restoObj.id}</td>
+            <td>{restoObj.name}</td>
+            <td>{restoObj.image}</td>
+            <td>{restoObj.description}</td>
+        </tr>
+    )
 }
+
 
 export default Resto;

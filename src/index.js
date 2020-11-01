@@ -4,6 +4,7 @@ import './index.css';
 import Menu from './Menu';
 import App from './App';
 import App2 from './App2';
+import FApp from './FApp';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
@@ -13,7 +14,8 @@ ReactDOM.render(
   document.getElementById('menu')
 );
 
-const componentToDisplay = <App/>;
+//const componentToDisplay = <App/>;
+const componentToDisplay = <FApp/>;
 //const componentToDisplay = <App2/>;
 console.log(`process.env.NODE_ENV=${process.env.NODE_ENV}`)
 
